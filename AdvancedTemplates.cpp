@@ -62,6 +62,24 @@ public:
     static const int value = 1;
 };
 
+
+
+
+// Base case: When one arguments remains
+template <typename T>
+T sum(T first) {
+    cout<<"In base: "<<first<<endl;
+    return first;
+}
+
+// Variadic template function
+template <typename T, typename... Args>
+T sum(T first, Args... rest) {
+    cout<<"In non-base: "<<first<<endl;
+    return first + sum(rest...); // Recursive call with remaining arguments
+}
+
 int main()
 {
+    cout<<sum(1,2,3)<<endl;
 }
