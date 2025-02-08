@@ -79,6 +79,11 @@ T sum(T first, Args... rest) {
     return first + sum(rest...); // Recursive call with remaining arguments
 }
 
+template <typename... Args>
+auto efficient_sum(Args... args) {
+    return (args + ...);  // Expands as (((arg1 + arg2) + arg3) + arg4)
+}
+
 int main()
 {
     cout<<sum(1,2,3)<<endl;
