@@ -11,36 +11,7 @@ public:
         for (unsigned int i = 0; i < num_threads; ++i)
         {
             threads.emplace_back([this]
-                                 {
-                function<void()> task;
-
-                while (true)
-                {
-                    {
-                        // Has ownership of mutex
-                        // Locks automatically and unlocks automatically when destroyed
-                        // Can be manually locked and unlocked
-                        // movable not copyable
-                        // Supports try_lock
-                        // Locks on queue_mutex
-                        unique_lock<mutex> lock(queue_mutex);
-
-                        // Automatically unlocks lock while waiting
-                        // Supports notify_one and notify_all
-                        // If multiple threads are waiting, any of them can be woken up randomly.
-                        // Can be used to wait for a condition with a timeout
-                        cv.wait(lock, [this]
-                                { return !task_queue.empty() or stop; });
-
-                        if (stop and task_queue.empty())
-                            return;
-
-                        task = task_queue.front();
-                        task_queue.pop();
-                    }
-                    
-                    task();
-                } });
+                                 { worker(); });
         }
     }
 
@@ -80,6 +51,39 @@ private:
     condition_variable cv;
 
     bool stop = false;
+
+    void worker()
+    {
+        function<void()> task;
+
+        while (true)
+        {
+            {
+                // Has ownership of mutex
+                // Locks automatically and unlocks automatically when destroyed
+                // Can be manually locked and unlocked
+                // movable not copyable
+                // Supports try_lock
+                // Locks on queue_mutex
+                unique_lock<mutex> lock(queue_mutex);
+
+                // Automatically unlocks lock while waiting
+                // Supports notify_one and notify_all
+                // If multiple threads are waiting, any of them can be woken up randomly.
+                // Can be used to wait for a condition with a timeout
+                cv.wait(lock, [this]
+                        { return !task_queue.empty() or stop; });
+
+                if (stop and task_queue.empty())
+                    return;
+
+                task = task_queue.front();
+                task_queue.pop();
+            }
+
+            task();
+        }
+    }
 };
 
 int main()
