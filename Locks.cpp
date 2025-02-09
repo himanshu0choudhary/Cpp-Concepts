@@ -28,6 +28,19 @@ void lock_guard_thread(){
     cout<<"lock_guard_thread"<<endl;
 }
 
+
+void shared_lock_thread(){
+    shared_mutex smutex;
+
+    // A shared lock allows multiple threads to read a shared resource simultaneously but prevents any thread from writing to it.
+    // Also known as a "reader lock"
+    // A thread cannot acquire a shared lock if another thread holds a unique (exclusive) lock.
+    shared_lock<shared_mutex> slock(smutex);
+
+    // All the shared_lock shoud be released
+    unique_lock<shared_mutex> lock(smutex);
+}
+
 int main() {
     thread t1(unique_lock_thread);
 
