@@ -18,7 +18,7 @@ void unique_lock_thread(){
 void lock_guard_thread(){
     mutex m;
 
-    // Does not own the mutex
+    // Has ownership of mutex
     // When std::lock_guard is created, it locks the mutex
     // If an exception occurs, std::lock_guard ensures that the mutex is released
     // Cannot be copied or moved
